@@ -6,10 +6,18 @@ const membersSchema = new mongoose.Schema({
     required: true,
   },
   firstName: {
-    type: Date,
+    type: String,
+    required: true,
+  },
+  middleName: {
+    type: String,
     required: true,
   },
   lastName: {
+    type: String,
+    required: true,
+  },
+  address: {
     type: String,
     required: true,
   },
@@ -18,9 +26,25 @@ const membersSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  projects: {
+    type: [ String ],
+    required: true,
+  },
+  hardSkills: {
+    type: [ String ],
+    required: true,
+  },
+  softSkills: {
+    type: [ String ],
+    required: true,
+  },
+  supervisor: {
+    type: String,
+    required: true,
+  },
   kpi: {
     type: Number,
-    required: true
+    required: true,
   },
   isEmployee: {
     type: Boolean,
@@ -36,11 +60,11 @@ const membersSchema = new mongoose.Schema({
     required: true,
   },
   startDate: {
-    type: Date,
+    type: String,
     required: true,
   },
   endDate: {
-    type: Date,
+    type: String,
     required: true,
   },
 });
