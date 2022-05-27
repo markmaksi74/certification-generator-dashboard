@@ -1,7 +1,7 @@
 const membersDatabase = require("./members.mongo");
 
 const getAllMembers = async () => {
-  try {    
+  try {
     return await membersDatabase.find(
       {},
       {
@@ -14,10 +14,11 @@ const getAllMembers = async () => {
   }
 };
 
-const getOneMemberById = async (id) => {
+const getOneMemberById = async ({id}) => {
+  const filter = { memberId: id }
   try {
     return await membersDatabase.findOne(
-      {memberId: id},
+      filter,
       {
         _id: 0,
         __v: 0,
@@ -29,7 +30,14 @@ const getOneMemberById = async (id) => {
 };
 
 const getOneMemberByName = async (queriedMember) => {
-  try {    
+  // const firstName = member.firstName.toLowerCase();
+  // const lastName = member.lastName.toLowerCase();
+  // const memberWithoutFirstNameLastName = Object.fromEntries(
+  //   Object.entries(member).filter(([key, value]) => !key.includes("Name"))
+  // );
+  // // make firstName and lastName values lowercase for easy filtering and searching
+  // const lowerMember = { firstName, lastName, memberWithoutFirstNameLastName };
+  try {
     return await membersDatabase.findOne(queriedMember, {
       _id: 0,
       __v: 0,
@@ -40,16 +48,8 @@ const getOneMemberByName = async (queriedMember) => {
 };
 
 const saveMember = async (member) => {
-  const firstName = member.firstName.toLowerCase();
-  const lastName = member.lastName.toLowerCase();
-  const memberWithoutFirstNameLastName = Object.fromEntries(
-    Object.entries(member).filter(([key, value]) => !key.includes("Name"))
-  );
-  // make firstName and lastName values lowercase for easy filtering and searching
-  const lowerMember = { firstName, lastName, memberWithoutFirstNameLastName };
-
-  const newMember = new membersDatabase({ ...lowerMember });
-  // Save the document to the DB only if the added member does not already exist in the database
+  const newMember = new membersDatabase({ ...member });
+  // Save the document only if the member does not already exist in the database
   try {
     membersDatabase.findOne(
       {
@@ -64,16 +64,16 @@ const saveMember = async (member) => {
       }
     );
   } catch (error) {
-    console.error(`Can't add the user ${error}`);
+    console.error(`Can't add the user: ${error}`);
   }
 };
 
 const editMember = async (updatedMemberFields) => {
-  const { memberId: filteredMemberId } = updatedMemberFields;
+  const { memberId } = updatedMemberFields;
 
-  const filter = { filteredMemberId };
+  const filter = { memberId };
   const update = { ...updatedMemberFields };
-
+  console.log(filter)
   // Find a document with specified memberId and update with all provided values
   try {
     return await membersDatabase.findOneAndUpdate(filter, update);
