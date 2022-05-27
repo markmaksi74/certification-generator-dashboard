@@ -1,16 +1,34 @@
-const { saveMember } = require("../../models/members.model");
+const { v4: uuidv4 } = require("uuid");
+const {
+  saveMember,
+  editMember,
+  getAllMembers,
+  getOneMemberById,
+  getOneMemberByName,
+} = require("../../models/members.model");
 
-const getAllMembers = async (req, res) => {
-  res.send(`API running :)`);
+const httpGetAllMembers = async (req, res) => {
+  return res.status(200).json(await getAllMembers());
+};
+
+const httpGetOneMemberById = async (req, res) => {
+  const id = req.params;
+  return res.status(200).json(await getOneMemberById(id));
+};
+
+const httpGetOneMemberByName = async (req, res) => {
+  queriedMember = req.query // { firstName: 'Mark', lastName: 'Maksi' }
+  const firstName = queriedMember.firstName.toLowerCase()
+  const lastName = queriedMember.lastName.toLowerCase()
+  lowerCaseQueriedMember = {firstName, lastName}
+  return res.status(200).json(await getOneMemberByName(lowerCaseQueriedMember));
 }
 
 const httpAddNewMember = async (req, res) => {
-  const member = req.body;
-  console.log(member, "member");
+  let member = req.body;
   if (
     !member.generatedId ||
     !member.firstName ||
-    !member.middleName ||
     !member.lastName ||
     !member.address ||
     !member.specification ||
@@ -27,17 +45,45 @@ const httpAddNewMember = async (req, res) => {
   ) {
     res.status(400).json({ error: "required data is missing" });
   } else {
+    const memberId = uuidv4();
+    member = { memberId, ...member };
     await saveMember(member);
     res.status(201).json(member);
   }
-}
+};
 
-const httpEditMember = (req, res) => {
-  
-}
+const httpEditMember = async (req, res) => {
+  const updatedMember = req.body;
+  if (
+    !updatedMember.memberId || // required for findOneAndUpdate filter property
+    !updatedMember.generatedId ||
+    !updatedMember.firstName ||
+    !updatedMember.lastName ||
+    !updatedMember.address ||
+    !updatedMember.specification ||
+    !updatedMember.supervisor ||
+    !updatedMember.kpi ||
+    updatedMember.isEmployee === undefined ||
+    updatedMember.isIntern === undefined ||
+    !updatedMember.hardSkills ||
+    !updatedMember.softSkills ||
+    !updatedMember.projects ||
+    !updatedMember.duration ||
+    !updatedMember.startDate ||
+    !updatedMember.endDate
+  ) {
+    return res.status(400).json({ error: "required data is missing" });
+  } else {
+    await editMember(updatedMember);
+    return res.status(201).json(updatedMember);
+  }
+};
 
 module.exports = {
+  httpGetAllMembers,
+  httpGetOneMemberById,
+  httpGetOneMemberByName,
   httpAddNewMember,
-  getAllMembers,
-  httpEditMember
+  httpEditMember,
 };
+

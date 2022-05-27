@@ -1,15 +1,14 @@
 const mongoose = require("mongoose");
 
 const membersSchema = new mongoose.Schema({
+  memberId: {
+    type: String,
+  },
   generatedId: {
     type: String,
     required: true,
   },
   firstName: {
-    type: String,
-    required: true,
-  },
-  middleName: {
     type: String,
     required: true,
   },
